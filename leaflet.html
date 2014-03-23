@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Vietnamese</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7/leaflet.css"/>
+	<!-- <link rel="stylesheet" href="leafletd3.css"/> --></head>
+<body>
+    <div id="title">VietMap: Language & Business Distributions</div>
+    <div id="map" style="width: 600px; height: 400px"></div>
+    <script type="text/javascript" src="http://maps.stamen.com/js/tile.stamen.js?v1.2.4"></script>
+	<script src="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js"></script>    
+    <script type="text/javascript" src="d3/d3.min.js"></script>
+    <script src="http://leaflet.github.io/Leaflet.heat/dist/leaflet-heat.js"> </script>
+    <script type="text/javascript" src="http://maps.stamen.com/js/tile.stamen.js?v1.2.4"></script>
+	<link rel="stylesheet" type="text/css" href="map.css"> 
+    <script src="geotoarray.js"></script>
+    <script>
+
+
+
+var layer = new L.StamenTileLayer("toner-background");
+var map = new L.Map("map", {
+    center: new L.LatLng(39.737567 , -104.984718),
+    zoom: 10
+});
+map.addLayer(layer);
+
+ 
+        
+        var heat = L.heatLayer(points,{
+            opacity: .2,
+            radius: 10,
+            blur: 10, 
+            maxZoom: 20,
+            max: .2,
+            gradient: {.3: "#F2F1EF", 1: "#e67e22" }
+            // "#F2784B"
+        }).addTo(map)
+        ;
+//D3 portion begins    
+		
+					
+	/* Initialize the SVG layer */
+	map._initPathRoot()    
+
+	/* We simply pick up the SVG from the map object */
+	var svg = d3.select("#map").select("svg"), g = svg.append("g");
+		
+		var reviewsNum = svg.append("text");
+		var reviewsText = svg.append("text");
+        var nameText = svg.append("text");
+		d3.csv("vietrest.csv", function(datacsv) {
+			/* Add a LatLng object to each item in the dataset */
+			datacsv.forEach(function(d) {
+				d.LatLng = new L.LatLng(d.Lat,d.Lon)
+				})
+  
+			var feature = g.selectAll("circle")
+				   .data(datacsv)
+				   .enter()
+				   .append("circle");
+               
+               feature.on("mouseover", function(d) {
+					d3.select(this)
+				          .transition()
+				          .duration(1000)
+				          .ease("elastic")
+				          .style("opacity", .6)
+				          .attr("r", function(d) {
+				   			return Math.sqrt(parseInt(d.Reviews) * 4);
+			  				 })
+				          ;
+					reviewsNum
+						  .text(d.Reviews)
+						  .attr("class", "numshow")
+						  .attr("x", 595)
+						  .attr("y", 35)
+						  .attr("text-anchor", "left")
+						  .attr("font-family", "sans-serif")
+						  .attr("font-size", "11px");
+
+					reviewsText
+						  .text("Reviews")
+						  .attr("class", "reviewsshow")
+						  .attr("x", 595)
+						  .attr("y", 47)
+						  .attr("text-anchor", "left")
+						  .attr("font-family", "sans-serif")
+						  .attr("font-size", "11px");
+					 nameText
+						  .text(d.Name)
+						  .attr("class", "nameshow")
+						  .attr("x", 595)
+						  .attr("y", 60)
+						  .attr("text-anchor", "left")
+						  .attr("font-family", "sans-serif")
+						  .attr("font-size", "6px");
+						});
+						
+				feature.on("mouseout", function() {		
+				//Remove the tooltip
+				reviewsNum
+					.attr("class", "tooltiphide");
+				reviewsText
+					.attr("class", "tooltiphide");
+				nameText
+					.attr("class", "tooltiphide");
+				d3.select(this)
+			          .transition()
+			          .duration(500)
+			          .attr("r", function(d) {
+							   return Math.sqrt(parseInt(d.Reviews) * 0.5);
+						   })
+			  		  .style("opacity", function(d) {
+				   return Math.sqrt(parseInt(d.Reviews) * 0.0003); })
+						;
+				});
+						
+		function update() {
+		  feature.attr("cx",function(d) { return map.latLngToLayerPoint(d.LatLng).x})
+		  feature.attr("cy",function(d) { return map.latLngToLayerPoint(d.LatLng).y})
+		  feature.attr("r", function(d) { return Math.sqrt(parseInt(d.Reviews) * 0.5)})
+		  feature.style("fill", "#446178")
+		  feature.style("opacity", function(d) { return Math.sqrt(parseInt(d.Reviews) * 0.0008); })
+		}
+		map.on("viewreset", update);
+		update();
+	})			 
+    
+    </script>
+</body>
+</html>

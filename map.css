@@ -1,0 +1,37 @@
+#title {
+	font-family:Futura;
+	font-weight:400;
+}
+
+.numshow {
+	font-family: Century Gothic;
+	font-size: 350%;
+	font-weight:bold;
+	stroke: #34282C;
+	stroke-width: 1;
+	fill: none;
+	text-anchor: end;
+	display:block;
+}
+
+.reviewsshow {
+	font-family: Century Gothic;
+	font-size: 110%;
+	font-weight:bold;
+	stroke: #34282C;
+	fill: none;
+	stroke-width: .5;
+	text-anchor: end;
+	display:block;
+}
+.nameshow {
+	font-family: Century Gothic;
+	font-size: 100%;
+	fill: #34282C;
+	text-anchor: end;
+	display:block;
+}
+
+.tooltiphide {
+	display: none;
+}
